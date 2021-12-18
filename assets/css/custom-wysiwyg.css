@@ -1,0 +1,18 @@
+.ingress {
+	font-family: sans-serif;
+	font-size: 1.2em;
+}
+.thinner {
+	font-weight: lighter;
+}
+.blue-text{
+	color:#a1e1ed;
+}
+.upper {
+	text-transform: uppercase;
+	font-size: 0.9em;
+}
+.smaller{
+	font-size:0.9em;
+	font-family: sans-serif;
+}

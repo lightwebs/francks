@@ -1,0 +1,46 @@
+@mixin scrollbar {
+  padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+
+  &::-webkit-scrollbar {
+    -webkit-appearance: none;
+    height: 6px;
+  }
+
+  /* Track */
+  &::-webkit-scrollbar-track {
+    background: rgba(207, 199, 199, 0.28);
+  }
+
+  /* Handle */
+  &::-webkit-scrollbar-thumb {
+    background: #cfc7c7;
+    background-color: rgb(207, 199, 199);
+    border-radius: 50px;
+  }
+
+  /* Handle on hover */
+  &::-webkit-scrollbar-thumb:hover {
+    background: darken($color: #cfc7c7, $amount: 5);
+  }
+
+  // scrollbar-color: #cfc7c7 transparent;
+  // scrollbar-width: thin;
+}
+
+@mixin scrollbar_min {
+  @include scrollbar;
+  &::-webkit-scrollbar {
+    height: 3px;
+  }
+  padding-bottom: 1px;
+  margin-bottom: 2px;
+}
+
+@mixin scrollbar_min_vertical {
+  @include scrollbar;
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  padding-right: 4px;
+}

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="26.629" height="26.629" viewBox="0 0 26.629 26.629">
+  <g id="icon-crosshair" transform="translate(1.5 1.5)">
+    <path id="Path_15" data-name="Path 15" d="M26.629,14.815A11.815,11.815,0,1,1,14.815,3,11.815,11.815,0,0,1,26.629,14.815Z" transform="translate(-3 -3)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <path id="Path_16" data-name="Path 16" d="M31.726,18H27" transform="translate(-8.097 -6.185)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <path id="Path_17" data-name="Path 17" d="M7.726,18H3" transform="translate(-3 -6.185)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <path id="Path_18" data-name="Path 18" d="M18,7.726V3" transform="translate(-6.185 -3)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+    <path id="Path_19" data-name="Path 19" d="M18,31.726V27" transform="translate(-6.185 -8.097)" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"/>
+  </g>
+</svg>
