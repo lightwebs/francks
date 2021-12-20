@@ -8,7 +8,7 @@
   }
   #singlehead {
     .content {
-      @media only screen and (max-width: 1000px) {
+      @media only screen and (max-width: 991px) {
       }
       padding: 10px;
     }
@@ -18,7 +18,7 @@
 #f-map {
   height: 43vw;
 
-  @media all and (max-width: 1000px) {
+  @media all and (max-width: 991px) {
     height: 400px;
   }
 }
@@ -34,8 +34,9 @@
     "search map map map"
     "offices map map map";
   column-gap: 12px;
+  grid-template-columns: 1fr 45%;
 
-  @media only screen and (max-width: 1000px) {
+  @media only screen and (max-width: 991px) {
     grid-template:
       "search"
       "map"
@@ -46,7 +47,7 @@
   &--search {
     grid-area: search;
 
-    @media only screen and (max-width: 1000px) {
+    @media only screen and (max-width: 991px) {
       padding: 0 15px;
     }
 
@@ -59,12 +60,13 @@
     &--input {
       padding-right: 60px !important;
 
-      @media only screen and (max-width: 1000px) {
+      @media only screen and (max-width: 991px) {
         padding: 8px 12px !important;
       }
     }
 
     &--btn {
+      flex-shrink: 0;
       position: absolute;
       top: 0;
       right: 0;
@@ -73,8 +75,8 @@
       height: 100%;
       width: 55px;
 
-      @media only screen and (max-width: 1000px) {
-        width: 36px;
+      @media only screen and (max-width: 991px) {
+        width: 38px;
       }
 
       &:after {
@@ -92,7 +94,7 @@
       margin-top: 0;
       margin-bottom: 20px;
 
-      @media only screen and (max-width: 1000px) {
+      @media only screen and (max-width: 991px) {
         padding: 12px !important;
       }
     }
@@ -103,11 +105,13 @@
     padding-top: 20px;
     height: calc(43vw - 150px);
 
-    @media only screen and (max-width: 767px) {
-      margin: -80px 0 -40px 5px;
+    @media only screen and (max-width: 991px) {
+      margin: -80px 0 -40px 0;
       border-radius: 27px 27px 0 0;
       z-index: 2;
       height: 250px;
+      background: $lightblue;
+      border-bottom: 4px solid #bcccd3;
     }
 
     &.active {
@@ -124,14 +128,13 @@
     @include scrollbar_min_vertical;
   }
   &--area {
+    min-width: 0;
     grid-area: map;
   }
 }
 
 .lw-office-item {
-  background: $lightblue;
   padding: 40px;
-  border-radius: 27px;
   margin-bottom: 20px;
   width: 100%;
   opacity: 1;
@@ -139,6 +142,15 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+
+  @media all and (min-width: 991px) {
+    border-radius: 27px;
+    background: $lightblue;
+  }
+
+  @media all and (max-width: 991px) {
+    border-bottom: 2px solid $darkblue;
+  }
 
   &.hide {
     position: absolute;
@@ -180,10 +192,14 @@
     }
   }
 
+  &--find-btn-wrapper {
+    position: relative;
+  }
+
   &--find-btn {
-    display: flex !important;
-    align-items: center;
+    position: relative;
     padding-right: 45px !important;
+    cursor: pointer;
 
     @media all and (max-width: 767px) {
       margin-top: 0 !important;
@@ -206,16 +222,47 @@
     }
   }
 
-  .btn-wrapper {
-    @media all and (max-width: 767px) {
-      flex-flow: wrap;
+  &--find-links {
+    // position: absolute;
+    // top: calc(100% + 10px);
+    display: none;
+    white-space: nowrap;
+    gap: 10px;
+    margin-top: 10px;
+
+    a {
+      text-transform: uppercase;
+      font-size: 14px;
+      font-weight: bold;
+
+      &:after {
+        content: "";
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        margin-left: 4px;
+        background: url(./../../assets/img/icons/icon-newlink.svg) no-repeat
+          center;
+        background-size: contain;
+      }
     }
+  }
+
+  &--find-btn-wrapper.active {
+    .lw-office-item--find-links {
+      display: flex;
+    }
+  }
+
+  .btn-wrapper {
+    align-items: flex-start;
   }
 }
 
 .btn-wrapper {
   display: flex;
   align-items: flex-end;
+  flex-flow: wrap;
   gap: 12px;
   width: 100%;
 }
@@ -259,7 +306,7 @@
   z-index: 1;
   left: 0;
   right: 0;
-  top: 5px;
+  top: -15px;
   margin: 0 auto;
   background: $lightblue url(./../../assets/img/icons/icon-arrowup.svg)
     no-repeat center;
@@ -267,10 +314,11 @@
   width: 30px;
   height: 30px;
   border-radius: 50px;
+  box-shadow: 0px 2px 4px #bcccd3;
   transform: rotate(0);
   transition: transform 0.2s;
 
-  @media only screen and (min-width: 767px) {
+  @media only screen and (min-width: 991px) {
     display: none;
   }
 }

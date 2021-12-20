@@ -1,0 +1,52 @@
+{
+    "key": "group_61b8a74a8ec5a",
+    "title": "Template: Kontakt",
+    "fields": [
+        {
+            "key": "field_61b8abb57c242",
+            "label": "Karta",
+            "name": "map",
+            "type": "google_map",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "center_lat": "61.81968716499342",
+            "center_lng": "15.268916258372714",
+            "zoom": 6,
+            "height": 600
+        }
+    ],
+    "location": [
+        [
+            {
+                "param": "page_template",
+                "operator": "==",
+                "value": "template-map.php"
+            }
+        ],
+        [
+            {
+                "param": "taxonomy",
+                "operator": "==",
+                "value": "lan"
+            }
+        ]
+    ],
+    "menu_order": 0,
+    "position": "normal",
+    "style": "default",
+    "label_placement": "top",
+    "instruction_placement": "label",
+    "hide_on_screen": [
+        "comments"
+    ],
+    "active": true,
+    "description": "",
+    "show_in_rest": 0,
+    "modified": 1640014988
+}
