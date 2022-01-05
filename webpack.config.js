@@ -23,8 +23,8 @@ const paths = {
 };
 
 module.exports = {
-    // watch: true,
-    // mode: 'development',
+    watch: true,
+    mode: 'development',
     entry: [paths.appIndexJs],
 	output: {
     path: path.resolve(__dirname, 'dist'),

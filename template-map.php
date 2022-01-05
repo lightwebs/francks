@@ -48,10 +48,6 @@ $offices = get_terms([
                             data-lat="<?php echo esc_attr($location['lat']); ?>"
                             data-lng="<?php echo esc_attr($location['lng']); ?>">
 
-                            <?php if( $img ) : ?>
-                                <div class="lw-office-item--img" <?php echo $img ? 'style="background-image: url('.$img['url'].');"' : ''; ?>></div>
-                            <?php endif; ?>
-
                             <h3 class="lw-office-item--county"><?php echo $county->name; ?></h3>
                             <h2 class="lw-office-item--city"><?php echo $o->name; ?></h2>
                             <div class="lw-office-item--contact-info">
@@ -85,6 +81,10 @@ $offices = get_terms([
 
                                 </div>
                             </div>
+
+                            <?php if( $img ) : ?>
+                                <div class="lw-office-item--img" <?php echo $img ? 'style="background-image: url('.$img['url'].');"' : ''; ?>></div>
+                            <?php endif; ?>
                         </div>
                         <?php endif; ?>
                     <?php endif; ?>

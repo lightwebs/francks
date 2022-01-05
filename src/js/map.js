@@ -1,6 +1,6 @@
-
-var map, marker, allMarkers, bounds, pin, largePin, me, markers = [], markersArray = [];
+var map, marker, allMarkers, bounds, pin, largePin, me, markers = [], markersArray = [], searchMarker, myMarker, showing, centerPos;
 let officeItems = document.querySelectorAll('.lw-office-item');
+var searchInput = document.querySelector('.lw-map--search--input');
 
 function initMap() {
     allMarkers = document.querySelectorAll('.marker');
@@ -11,16 +11,6 @@ function initMap() {
         mapTypeId   : google.maps.MapTypeId.ROADMAP,
         disableDefaultUI: true,
         zoomControl: false,
-        // center: true,
-        // restriction: {
-        //     latLngBounds: {
-        //         north: 69.5,
-        //         south: 55.1331192,
-        //         east: 25.0,
-        //         west: 10.6,
-        //     },
-        //     // strictBounds: true,
-        // },
     };
 
     if ( window.innerWidth > 767 ) {
@@ -34,13 +24,14 @@ function initMap() {
     allMarkers.forEach(marker => {
         initMarker(marker, map);
     });
-
+    
     // Center map based on markers.
     centerMap( map );
 
     // Return map instance.
     return map;
 }
+
 
 // var infowindow = new google.maps.InfoWindow;
 let currentMarker = null;
@@ -59,10 +50,12 @@ function initMarker( marker, map ) {
     pin = {
         url: `${lwGlobal.templateDir}/assets/img/icons/map-pin.png`,
         scaledSize: new google.maps.Size(27, 40),
+        zIndex: 0
     }
     largePin = {
         url: `${lwGlobal.templateDir}/assets/img/icons/map-pin-red.png`,
         scaledSize: new google.maps.Size(36, 56),
+        zIndex: 100
     }
     
     me = {
@@ -125,6 +118,7 @@ function initMarker( marker, map ) {
     });
 }
 
+
 function centerMap( map ) {
     // Create map boundaries from all map markers.
     bounds = new google.maps.LatLngBounds();
@@ -145,23 +139,25 @@ function centerMap( map ) {
     }
 }
 
-officeItems.forEach(officeItem => officeItem.addEventListener('mouseover', function() {
-    map.markers.map(marker => {
-        if( marker.id == officeItem.dataset.id ) {   
-            marker.setIcon(largePin);
-            marker.setZIndex(100);
-        }
+officeItems.forEach(officeItem => {
+    officeItem.addEventListener('mouseover', function() {
+        markersArray.map(marker => {
+            if( marker.id == officeItem.dataset.id ) {   
+                marker.setZIndex(100);
+                marker.setIcon(largePin);
+            }
+        });
     });
-}));
 
-officeItems.forEach(officeItem => officeItem.addEventListener('mouseout', function() {
-    map.markers.map(marker => {
-        if( marker.id == officeItem.dataset.id && currentMarker !== marker ) {   
-            marker.setIcon(pin);
-            marker.setZIndex(0);
-        }
+    officeItem.addEventListener('mouseout', function() {
+        markersArray.map(marker => {
+            if( marker.id == officeItem.dataset.id && currentMarker !== marker ) {   
+                marker.setZIndex(0);
+                marker.setIcon(pin);
+            }
+        });
     });
-}));
+});
 
 
 document.addEventListener("DOMContentLoaded", initMap);
@@ -171,17 +167,71 @@ locationButton.addEventListener("click", getMyLocation);
 
 
 function rad(x) {return x*Math.PI/180;}
+function getClosestOffice(myPosition) {                      
+    var lat = myPosition.lat;
+    var lng = myPosition.lng;
+    var R = 6371; // radius of earth in km
+    var distances = [];
+    var closest = -1;
+    for( i = 0; i < markersArray.length; i++ ) {
+        var mlat = markersArray[i].position.lat();
+        var mlng = markersArray[i].position.lng();
+        var dLat  = rad(mlat - lat);
+        var dLong = rad(mlng - lng);
+        var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(rad(lat)) * Math.cos(rad(lat)) * Math.sin(dLong/2) * Math.sin(dLong/2);
+        var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        var d = R * c;
+        distances[i] = d;
+        if ( closest == -1 || d < distances[closest] ) {
+            closest = i;
+        }
+    }
+
+    centerPos = {
+        lat: markersArray[closest].position.lat(),
+        lng: markersArray[closest].position.lng()
+    }
+
+    markersArray[closest].setIcon(largePin);
+    markersArray[closest].setZIndex(100);
+    currentMarker = markersArray[closest];
+
+    officeItems.forEach(officeItem => officeItem.classList.add('hide'));
+    const currentOffice = [...officeItems].find(item => item.dataset.id == markersArray[closest].id);
+    currentOffice.classList.remove('hide');
+}
+
+
+// När man klickar på knappen Hitta min närmaste Francks
 function getMyLocation(myPosition) {
+    if ( myMarker ) myMarker.setMap(null);
     if (navigator.geolocation) {
         locationButton.innerHTML = 'Hittar din närmaste Francks';
         navigator.geolocation.getCurrentPosition(
           (position) => {
+
             myPosition = {
-              lat: parseFloat(position.coords.latitude),
-              lng: parseFloat(position.coords.longitude),
-            };            
-            map.setCenter(myPosition);
-            map.setZoom(8);
+                lat: parseFloat(position.coords.latitude),
+                lng: parseFloat(position.coords.longitude),
+            };
+
+            // map.setCenter(myPosition);
+            // map.setZoom(8);
+
+            getClosestOffice(myPosition);
+
+            let markerPositions = [centerPos, myPosition];
+            bounds = new google.maps.LatLngBounds();
+            markerPositions.map(marker => {
+                bounds.extend({
+                    lat: marker.lat,
+                    lng: marker.lng
+                });
+            });
+            
+            map.fitBounds(bounds);
+
             locationButton.innerHTML = 'Använd min position';
 
             myMarker = new google.maps.Marker({
@@ -191,39 +241,10 @@ function getMyLocation(myPosition) {
                 optimized: false,
                 animation: google.maps.Animation.BOUNCE
             });
-
+      
             setTimeout(() => {
                 myMarker.setAnimation(null);
             }, 2200);
-
-            
-            var lat = myPosition.lat;
-            var lng = myPosition.lng;
-            var R = 6371; // radius of earth in km
-            var distances = [];
-            var closest = -1;
-            for( i = 0; i < markersArray.length; i++ ) {
-                var mlat = markersArray[i].position.lat();
-                var mlng = markersArray[i].position.lng();
-                var dLat  = rad(mlat - lat);
-                var dLong = rad(mlng - lng);
-                var a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                    Math.cos(rad(lat)) * Math.cos(rad(lat)) * Math.sin(dLong/2) * Math.sin(dLong/2);
-                var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-                var d = R * c;
-                distances[i] = d;
-                if ( closest == -1 || d < distances[closest] ) {
-                    closest = i;
-                }
-            }
-        
-            markersArray[closest].setIcon(largePin);
-            markersArray[closest].setZIndex(100);
-            currentMarker = markersArray[closest];
-
-            officeItems.forEach(officeItem => officeItem.classList.add('hide'));
-            const currentOffice = [...officeItems].find(item => item.dataset.id == markersArray[closest].id);
-            currentOffice.classList.remove('hide');
         
           },
           () => {
@@ -236,6 +257,8 @@ function getMyLocation(myPosition) {
     }
 }
 
+
+// Om man inte har accepterat geolocation i webbläsaren eller om det inte stöds.
 function handleLocationError(browserHasGeolocation, myPosition) {
     console.log(
       browserHasGeolocation
@@ -245,6 +268,64 @@ function handleLocationError(browserHasGeolocation, myPosition) {
 }
 
 
+// När man söker med hjälp av Google fältet
+function getSearchedLocation(myPosition) {
+    const options = {
+        fields: ["geometry"],
+        strictBounds: false,
+    };
+
+    const autocomplete = new google.maps.places.Autocomplete(searchInput, options);
+
+    document.body.addEventListener('keyup', function(e){
+        if ( showing < 1 ) {
+            document.querySelector('.pac-container').classList.remove('hide');
+        } else {
+            document.querySelector('.pac-container').classList.add('hide');
+        }
+    });
+
+    autocomplete.bindTo("bounds", map);
+
+    searchMarker = new google.maps.Marker({
+        map,
+        anchorPoint: new google.maps.Point(0, -29)
+    });
+
+    autocomplete.addListener("place_changed", () => {
+        searchMarker.setVisible(false);
+        const place = autocomplete.getPlace();
+    
+        // If the place has a geometry, then present it on a map.
+        if (place.geometry.viewport) {
+          map.fitBounds(place.geometry.viewport);
+        } else {
+          map.setCenter(place.geometry.location);
+          map.setZoom(8);
+        }
+        searchMarker.setPosition(place.geometry.location);
+        searchMarker.setVisible(true);
+
+        myPosition = {
+            lat: parseFloat(place.geometry.location.lat()),
+            lng: parseFloat(place.geometry.location.lng()),
+        };
+        getClosestOffice(myPosition);
+
+        let markerPositions = [centerPos, myPosition];
+        bounds = new google.maps.LatLngBounds();
+        markerPositions.map(marker => {
+            bounds.extend({
+                lat: marker.lat,
+                lng: marker.lng
+            });
+        });
+        
+        map.fitBounds(bounds);
+    });
+}
+document.addEventListener("DOMContentLoaded", getSearchedLocation);
+
 const uparrow = document.querySelector('#uparrow');
 const officeWrapper = document.querySelector('.lw-map--offices');
 uparrow.addEventListener('click', ()=> {
@@ -252,34 +333,33 @@ uparrow.addEventListener('click', ()=> {
 })
 
 
-
-const searchInput = document.querySelector('.lw-map--search--input');
 const nothingFound = document.querySelector('.nothing-found');
-
-function displayMatches(e) {
-    var searchVal, i, txtValue, markVal;
-    searchVal = searchInput.value.toUpperCase();
-    
+function displayMatches() {
+    var searchVal, i, txtValue, markVal; 
+    searchVal = searchInput.value.toUpperCase();    
+    showing = 0;
 
     for (i = 0; i < officeItems.length; i++) {
 
         txtValue = officeItems[i].textContent || officeItems[i].innerText;
         if (txtValue.toUpperCase().indexOf(searchVal) > -1) {
+            showing += 1;
             officeItems[i].classList.remove('hide');
         } else {
             officeItems[i].classList.add('hide');
         }
+
     }
 
     for (i = 0; i < markersArray.length; i++) {
         markVal = markersArray[i].address;
         if (markVal.toUpperCase().indexOf(searchVal) > -1) {
-            markersArray[i].setIcon(largePin);
             markersArray[i].setZIndex(100);
+            markersArray[i].setIcon(largePin);
             currentMarker = markersArray[i];
         } else {
-            markersArray[i].setIcon(pin);
             markersArray[i].setZIndex(0);
+            markersArray[i].setIcon(pin);
         }
     }
 
@@ -288,9 +368,8 @@ function displayMatches(e) {
     } 
 }
 
-if (searchInput) {
-    searchInput.addEventListener('keyup', displayMatches);
-}
+searchInput.addEventListener('keyup', displayMatches);
+
 
 function resetAll() {
     map.markers.map(marker => {
@@ -299,15 +378,27 @@ function resetAll() {
     });
     officeItems.forEach(officeItem => officeItem.classList.remove('hide'));
     searchInput.value = '';
+    if ( searchMarker ) searchMarker.setMap(null);
+    if ( myMarker ) myMarker.setMap(null);
     centerMap( map );
 }
-const resetOffices = document.querySelector('.reset-offices');
-resetOffices.addEventListener('click', resetAll);
+document.querySelector('.reset-offices').addEventListener('click', resetAll);
+
+document.querySelectorAll('.lw-office-item--find-btn').forEach(btn => btn.addEventListener('click', function() {
+    btn.parentNode.classList.toggle('active');
+}));
 
 
-const findBtns = document.querySelectorAll('.lw-office-item--find-btn');
-if( findBtns ) {
-    findBtns.forEach(btn => btn.addEventListener('click', function() {
-        btn.parentNode.classList.toggle('active');
-    }));
-}
+// let dropDownItems;
+// document.body.addEventListener('keyup', function(e){
+//     e.preventDefault();
+//     if ( e.code === 'Enter' ) {
+//         const dropDownItem = document.getElementsByClassName('pac-item-selected');
+//         console.log(e.code, dropDownItem.innerHTML);
+//         if( dropDownItem ) {
+//             console.log(dropDownItem);
+//         }
+//         // dropDownItems.forEach(item => {
+//         // })
+//     }
+// })

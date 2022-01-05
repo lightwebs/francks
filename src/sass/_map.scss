@@ -165,8 +165,8 @@
     background-size: cover;
     height: 0;
     padding-bottom: 60%;
-    margin: -40px 0 10px -40px;
-    border-radius: 27px 27px 0 0;
+    margin: 40px 0 -40px -40px;
+    border-radius: 0 0 27px 27px;
   }
 
   &--county {
@@ -338,4 +338,8 @@
   &.show {
     opacity: 1;
   }
+}
+
+.pac-container.hide {
+  display: none !important;
 }
