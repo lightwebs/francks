@@ -205,6 +205,7 @@ function getClosestOffice(myPosition) {
 
 // När man klickar på knappen Hitta min närmaste Francks
 function getMyLocation(myPosition) {
+    locationButton.classList.add('loading');
     if ( myMarker ) myMarker.setMap(null);
     if (navigator.geolocation) {
         locationButton.innerHTML = 'Hittar din närmaste Francks';
@@ -246,6 +247,7 @@ function getMyLocation(myPosition) {
                 myMarker.setAnimation(null);
             }, 2200);
         
+            locationButton.classList.remove('loading');
           },
           () => {
             handleLocationError(true, map.getCenter());
@@ -260,6 +262,7 @@ function getMyLocation(myPosition) {
 
 // Om man inte har accepterat geolocation i webbläsaren eller om det inte stöds.
 function handleLocationError(browserHasGeolocation, myPosition) {
+    locationButton.classList.remove('loading');
     console.log(
       browserHasGeolocation
         ? "Error: The Geolocation service failed."
@@ -301,7 +304,7 @@ function getSearchedLocation(myPosition) {
           map.fitBounds(place.geometry.viewport);
         } else {
           map.setCenter(place.geometry.location);
-          map.setZoom(8);
+        //   map.setZoom(8);
         }
         searchMarker.setPosition(place.geometry.location);
         searchMarker.setVisible(true);
